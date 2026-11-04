@@ -150,7 +150,9 @@
 const PROXIES = [
   u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
   u => 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(u),
+  u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u),
 ];
+const FETCH_TIMEOUT_MS = 8000;
 const LOCALES = { en:'en-GB', ur:'ur-PK', ar:'ar-EG', ja:'ja-JP', zh:'zh-CN' };
 const LANGS = {
   en: { label:'English', dir:'ltr', cls:'', feeds:{ world:[
@@ -182,37 +184,64 @@ function ago(date, lang){
   if(m < 60) return m + ' ' + (m===1 ? L[0][0] : L[0][1]);
   const h = Math.floor(m/60); return h + ' ' + (h===1 ? L[1][0] : L[1][1]);
 }
-async function fetchFeed(feed){
-  for(const make of PROXIES){
-    try{
-      const r = await fetch(make(feed.url), { cache:'no-store' });
-      if(!r.ok) continue;
-      const text = await r.text();
-      if(text.trim().startsWith('{')){
-        const j = JSON.parse(text);
-        if(j && j.items) return j.items.map(it => ({ title: it.title || '', link: it.link || '', desc: strip(it.description || it.content || ''), date: new Date(it.pubDate || ''), img: (it.enclosure && it.enclosure.link) || (it.thumbnail) || '', source: feed.name }));
-        continue;
-      }
-      const doc = new DOMParser().parseFromString(text, 'text/xml');
-      const items = [...doc.querySelectorAll('item')].map(it => {
-        const get = t => { const n = it.getElementsByTagName(t)[0]; return n ? n.textContent : ''; };
-        let img = '';
-        const media = it.getElementsByTagName('media:content')[0] || it.getElementsByTagName('media:thumbnail')[0];
-        if(media && media.getAttribute('url')) img = media.getAttribute('url');
-        const enc = it.getElementsByTagName('enclosure')[0];
-        if(!img && enc && (enc.getAttribute('type')||'').startsWith('image')) img = enc.getAttribute('url');
-        if(!img){ const d = document.createElement('div'); d.innerHTML = get('description'); const im = d.querySelector('img'); if(im) img = im.src; }
-        return { title: get('title'), link: get('link'), desc: strip(get('description')), date: new Date(get('pubDate') || get('dc:date') || ''), img, source: feed.name };
-      });
-      if(items.length) return items;
-    }catch(e){ /* try next proxy */ }
+function fetchTimeout(url, ms){
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  return fetch(url, { cache:'no-store', signal: ctl.signal }).finally(() => clearTimeout(t));
+}
+function parseFeedText(text, feed){
+  if(text.trim().startsWith('{')){
+    const j = JSON.parse(text);
+    if(j && j.items) return j.items.map(it => ({ title: it.title || '', link: it.link || '', desc: strip(it.description || it.content || ''), date: new Date(it.pubDate || ''), img: (it.enclosure && it.enclosure.link) || (it.thumbnail) || '', source: feed.name }));
+    return [];
   }
-  return [];
+  const doc = new DOMParser().parseFromString(text, 'text/xml');
+  return [...doc.querySelectorAll('item')].map(it => {
+    const get = t => { const n = it.getElementsByTagName(t)[0]; return n ? n.textContent : ''; };
+    let img = '';
+    const media = it.getElementsByTagName('media:content')[0] || it.getElementsByTagName('media:thumbnail')[0];
+    if(media && media.getAttribute('url')) img = media.getAttribute('url');
+    const enc = it.getElementsByTagName('enclosure')[0];
+    if(!img && enc && (enc.getAttribute('type')||'').startsWith('image')) img = enc.getAttribute('url');
+    if(!img){ const d = document.createElement('div'); d.innerHTML = get('description'); const im = d.querySelector('img'); if(im) img = im.src; }
+    return { title: get('title'), link: get('link'), desc: strip(get('description')), date: new Date(get('pubDate') || get('dc:date') || ''), img, source: feed.name };
+  });
+}
+function firstSuccess(promises){
+  return new Promise((resolve, reject) => {
+    let left = promises.length, settled = false;
+    promises.forEach(p => Promise.resolve(p).then(v => { if(!settled){ settled = true; resolve(v); } },
+      () => { if(--left === 0 && !settled) reject(new Error('all failed')); }));
+  });
+}
+async function fetchFeed(feed){
+  const attempts = PROXIES.map(make => (async () => {
+    const r = await fetchTimeout(make(feed.url), FETCH_TIMEOUT_MS);
+    if(!r.ok) throw new Error('http ' + r.status);
+    const items = parseFeedText(await r.text(), feed);
+    if(!items.length) throw new Error('empty');
+    return items;
+  })());
+  try { return await firstSuccess(attempts); } catch(e){ return []; }
+}
+function cacheKey(){ return 'nova-news-v2-' + curLang + '-' + curCat; }
+function saveCache(items){
+  try { localStorage.setItem(cacheKey(), JSON.stringify({ t: Date.now(), items: items.map(i => ({ title: i.title, link: i.link, desc: i.desc, date: (i.date instanceof Date && !isNaN(i.date)) ? i.date.toISOString() : '', img: i.img, source: i.source })) })); } catch(e){}
+}
+function readCache(){
+  try {
+    const raw = localStorage.getItem(cacheKey());
+    if(!raw) return null;
+    const j = JSON.parse(raw);
+    if(!j || !Array.isArray(j.items) || !j.items.length) return null;
+    j.items.forEach(i => { i.date = new Date(i.date || ''); });
+    return j;
+  } catch(e){ return null; }
 }
 async function loadCoins(){
   const box = document.getElementById('coins');
   try{
-    const r = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=15&page=1&price_change_percentage=24h', { cache:'no-store' });
+    const r = await fetchTimeout('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=15&page=1&price_change_percentage=24h', FETCH_TIMEOUT_MS);
     if(!r.ok) throw new Error('cg');
     const coins = await r.json();
     box.innerHTML = coins.map(c => {
@@ -226,10 +255,15 @@ async function loadCoins(){
     try{
       const syms = ['BTCUSDT','ETHUSDT','USDTUSD','USDCUSDT','BNBUSDT','XRPUSDT','SOLUSDT','DOGEUSDT'];
       const out = [];
-      for(const s of syms){
-        const r = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=' + s, { cache:'no-store' });
-        if(r.ok){ const t = await r.json(); out.push({ name: s.replace('USDT','').replace('USD',''), price: parseFloat(t.lastPrice), ch: parseFloat(t.priceChangePercent) }); }
-      }
+      const rs = await Promise.all(syms.map(async s => {
+        try{
+          const rr = await fetchTimeout('https://api.binance.com/api/v3/ticker/24hr?symbol=' + s, 6000);
+          if(!rr.ok) return null;
+          const t = await rr.json();
+          return { name: (s.replace('USDT','').replace('USD','') || s), price: parseFloat(t.lastPrice), ch: parseFloat(t.priceChangePercent) };
+        }catch(e){ return null; }
+      }));
+      rs.forEach(x => { if(x) out.push(x); });
       if(out.length) box.innerHTML = out.map(c => '<div class="coin"><div class="nm">' + esc(c.name) + '</div><div class="pr">$' + c.price.toLocaleString('en-US', {maximumFractionDigits: 2}) + '</div><div class="ch ' + (c.ch >= 0 ? 'up' : 'down') + '">' + (c.ch >= 0 ? '▲' : '▼') + ' ' + Math.abs(c.ch).toFixed(2) + '% (24h)</div></div>').join('');
     }catch(e2){ /* keep placeholder */ }
   }
@@ -270,28 +304,49 @@ function toggleSum(btn){
   btn.textContent = open ? ui.seeLess : ui.seeMore;
   if(open) btn.closest('article').scrollIntoView({ behavior:'smooth', block:'start' });
 }
-async function load(){
-  const L = LANGS[curLang], ui = L.ui;
-  document.documentElement.lang = curLang;
-  document.body.dir = L.dir;
-  document.getElementById('content').className = L.cls;
-  const lt = document.getElementById('loadingTxt'); if(lt) lt.textContent = ui.loading;
-  const feeds = (L.feeds[curCat] || L.feeds.world);
-  let items = [];
-  for(const f of feeds){ items = items.concat(await fetchFeed(f)); }
-  items.sort((a,b) => (b.date - a.date) || 0);
-  items = items.filter(i => i.title);
-  render(items);
+let loadSeq = 0;
+function paintDate(){
   const now = new Date();
-  document.getElementById('updatedTxt').textContent = ui.updated + ': ' + now.toLocaleTimeString(LOCALES[curLang], {hour:'2-digit', minute:'2-digit'});
   const greg = now.toLocaleDateString(LOCALES[curLang], { weekday:'long', year:'numeric', month:'long', day:'numeric' });
   let hijri = '';
   try {
     const hLoc = (curLang === 'ja' || curLang === 'zh') ? 'en-u-ca-islamic-umalqura-nu-latn' : LOCALES[curLang] + '-u-ca-islamic-umalqura-nu-latn';
     hijri = new Intl.DateTimeFormat(hLoc, { day:'numeric', month:'long', year:'numeric' }).format(now);
   } catch(e){ hijri = ''; }
-  const hLabel = { en:'Hijri', ur:'ہجری', ar:'الهجري', ja:'ヒジュラ暦', zh:'伊斯兰历' }[curLang] || 'Hijri';
-  document.getElementById('dateTxt').textContent = hijri ? (greg + '  •  ' + hLabel + ': ' + hijri) : greg;
+  const hLabel = { en:'Hijri', ur:'\u06c1\u062c\u0631\u06cc', ar:'\u0627\u0644\u0647\u062c\u0631\u064a', ja:'\u30d2\u30b8\u30e5\u30e9\u66a6', zh:'\u4f0a\u65af\u5170\u5386' }[curLang] || 'Hijri';
+  document.getElementById('dateTxt').textContent = hijri ? (greg + '  \u2022  ' + hLabel + ': ' + hijri) : greg;
+}
+function paintUpdated(ts){
+  const ui = LANGS[curLang].ui;
+  const d = ts ? new Date(ts) : new Date();
+  document.getElementById('updatedTxt').textContent = ui.updated + ': ' + d.toLocaleTimeString(LOCALES[curLang], {hour:'2-digit', minute:'2-digit'});
+}
+async function load(){
+  const L = LANGS[curLang], ui = L.ui;
+  const mySeq = ++loadSeq, myLang = curLang, myCat = curCat;
+  document.documentElement.lang = curLang;
+  document.body.dir = L.dir;
+  document.getElementById('content').className = L.cls;
+  paintDate();
+  const cached = readCache();
+  if(cached){ render(cached.items); paintUpdated(cached.t); }
+  else { const lt = document.getElementById('loadingTxt'); if(lt) lt.textContent = ui.loading; }
+  const feeds = (L.feeds[curCat] || L.feeds.world);
+  let acc = [];
+  const jobs = feeds.map(f => fetchFeed(f).then(items => {
+    if(mySeq !== loadSeq || curLang !== myLang || curCat !== myCat) return;
+    if(!items.length) return;
+    const seen = {};
+    acc = acc.concat(items).filter(i => { const k = i.link || i.title; if(!k || seen[k]) return false; seen[k] = 1; return !!i.title; });
+    acc.sort((a,b) => (b.date - a.date) || 0);
+    render(acc);
+    saveCache(acc);
+    paintUpdated();
+  }).catch(() => {}));
+  await Promise.allSettled(jobs);
+  if(mySeq === loadSeq && curLang === myLang && curCat === myCat && !acc.length && !cached){
+    render([]);
+  }
 }
 function buildChrome(){
   const wrap = document.getElementById('langs');
