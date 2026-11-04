@@ -79,6 +79,33 @@
   .coin .pr { font-size:17px; font-weight:800; margin-top:4px; color:#f4c542; }
   .coin .ch { font-size:12px; margin-top:2px; font-weight:bold; }
   .up { color:#2fe07c; } .down { color:#ff5b71; }
+  .sigmood { display:flex; gap:9px; flex-wrap:wrap; margin-bottom:12px; }
+  .moodchip { padding:9px 16px; border-radius:20px; font-size:14px; font-weight:bold; border:1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.06); color:#e8edf5; }
+  .moodchip.fg-xf { background: rgba(200,16,38,.28); border-color:#ff2b44; color:#ffb3bc; }
+  .moodchip.fg-f { background: rgba(232,122,46,.20); border-color:#e87a2e; color:#ffc79a; }
+  .moodchip.fg-n { background: rgba(255,255,255,.07); border-color:rgba(255,255,255,.35); color:#c9d6ea; }
+  .moodchip.fg-g { background: rgba(47,224,124,.14); border-color:rgba(47,224,124,.55); color:#7deea9; }
+  .moodchip.fg-xg { background: linear-gradient(180deg,#1db954,#0f7a37); border-color:#2fe07c; color:#fff; }
+  .moodchip.trend { background: rgba(244,197,66,.10); border-color:rgba(244,197,66,.5); color:#f4c542; }
+  .siggrid { display:grid; grid-template-columns:1fr; gap:11px; }
+  @media (min-width:720px){ .siggrid { grid-template-columns:1fr 1fr; } }
+  .sigcard { padding:13px 15px; border-radius:14px; background: linear-gradient(160deg, rgba(255,255,255,.08), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.14); box-shadow:0 8px 20px rgba(0,0,0,.32); backdrop-filter: blur(6px); }
+  .sigtop { display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+  .sigtop img { width:22px; height:22px; flex:none; }
+  .signm { font-weight:bold; color:#fff; font-size:15px; }
+  .sigsym { color:#93a7c4; font-size:12px; font-weight:bold; }
+  .sigbadge { margin-inline-start:auto; font-size:11.5px; font-weight:bold; padding:4px 11px; border-radius:20px; white-space:nowrap; border:1px solid transparent; }
+  .sigbadge.b-su { background: linear-gradient(180deg,#1db954,#0f7a37); color:#fff; box-shadow:0 4px 12px rgba(29,185,84,.4); }
+  .sigbadge.b-mu { background: rgba(47,224,124,.15); color:#2fe07c; border-color:rgba(47,224,124,.5); }
+  .sigbadge.b-un { background: rgba(255,255,255,.08); color:#c9d6ea; border-color:rgba(255,255,255,.28); }
+  .sigbadge.b-md { background: rgba(255,91,113,.13); color:#ff8296; border-color:rgba(255,91,113,.5); }
+  .sigbadge.b-sd { background: linear-gradient(180deg,#ff2b44,#c40e26); color:#fff; box-shadow:0 4px 12px rgba(232,17,45,.4); }
+  .sigbadge.b-no { background: rgba(255,255,255,.05); color:#93a7c4; border:1px dashed rgba(255,255,255,.25); }
+  .sigrow { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-top:8px; }
+  .sigpr { font-size:19px; font-weight:800; color:#f4c542; }
+  .sigch { font-size:12.5px; color:#93a7c4; font-weight:bold; }
+  .sigreason { font-size:12.5px; color:#a9bcd8; margin-top:6px; line-height:1.6; }
+  .sigdisc { font-size:12px; color:#7d90ad; margin:10px 2px 0; line-height:1.6; }
   .cats { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:14px; }
   .cats button { padding:7px 16px; border-radius:20px; font-size:13.5px; cursor:pointer;
     background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.16); color:#c9d6ea; }
@@ -147,6 +174,10 @@
 <main>
   <div class="sec-title" id="cryptoTitle">💰 Live Crypto Prices</div>
   <div class="coins" id="coins"><div class="coin"><div class="nm">…</div></div></div>
+  <div class="sec-title" id="sigTitle">📈 Crypto Market Signals</div>
+  <div class="sigmood" id="sigMood"></div>
+  <div class="siggrid" id="sigGrid"></div>
+  <div class="sigdisc" id="sigDisc"></div>
   <div class="sec-title" id="newsTitle">📰 Latest News</div>
   <div class="cats" id="cats"></div>
   <div id="content"><div class="loading" id="loadingTxt">Loading the latest news…</div></div>
@@ -173,15 +204,15 @@ const LANGS = {
     sports:[ {name:'BBC Sport', url:'https://feeds.bbci.co.uk/sport/rss.xml'} ],
     business:[ {name:'BBC Business', url:'https://feeds.bbci.co.uk/news/business/rss.xml'} ],
     technology:[ {name:'BBC Technology', url:'https://feeds.bbci.co.uk/news/technology/rss.xml'} ] },
-    ui:{ breaking:'BREAKING NEWS', latest:'Latest News', more:'More World News — Popular Stories', moreBtn:'Load more news', crypto:'Live Crypto Prices', seeMore:'See more', seeLess:'See less', full:'Read full story', src:'Source', updated:'Last updated', refresh:'Refresh', loading:'Loading the latest news…', cats:{world:'World', pakistan:'Pakistan', sports:'Sports', business:'Business', technology:'Technology'} } },
+    ui:{ breaking:'BREAKING NEWS', latest:'Latest News', more:'More World News — Popular Stories', moreBtn:'Load more news', crypto:'Live Crypto Prices', sig:'Crypto Market Signals', mood:'Market Mood', trend:'Market trend today', trendUp:'Mostly up', trendDn:'Mostly down', trendMix:'Mixed', sUp:'Strong up signal', mUp:'Mild up signal', unc:'Unclear', mDn:'Mild down signal', sDn:'Strong down signal', noSig:'No signal', vH:'Volume high', vN:'Volume normal', vL:'Volume low', fgEF:'Extreme Fear', fgF:'Fear', fgN:'Neutral', fgG:'Greed', fgEG:'Extreme Greed', disc:'Signals are calculated from market data (price movement and volume). They are indicators, not financial advice, and cannot predict the future.', seeMore:'See more', seeLess:'See less', full:'Read full story', src:'Source', updated:'Last updated', refresh:'Refresh', loading:'Loading the latest news…', cats:{world:'World', pakistan:'Pakistan', sports:'Sports', business:'Business', technology:'Technology'} } },
   ur: { label:'اردو', dir:'rtl', cls:'rtl-text', feeds:{ world:[ {name:'BBC Urdu', url:'https://feeds.bbci.co.uk/urdu/rss.xml'}, {name:'BBC Urdu', url:'https://feeds.bbci.co.uk/urdu/pakistan/rss.xml'} ] },
-    ui:{ breaking:'بریکنگ نیوز', latest:'تازہ ترین خبریں', more:'مزید عالمی خبریں — مقبول کہانیاں', moreBtn:'مزید خبریں لوڈ کریں', crypto:'کرپٹو کی لائیو قیمتیں', seeMore:'مزید دیکھیں', seeLess:'کم دیکھیں', full:'مکمل خبر پڑھیں', src:'ذریعہ', updated:'آخری تازہ کاری', refresh:'تازہ کریں', loading:'تازہ ترین خبریں آ رہی ہیں…', cats:{world:'دنیا'} } },
+    ui:{ breaking:'بریکنگ نیوز', latest:'تازہ ترین خبریں', more:'مزید عالمی خبریں — مقبول کہانیاں', moreBtn:'مزید خبریں لوڈ کریں', crypto:'کرپٹو کی لائیو قیمتیں', sig:'کرپٹو مارکیٹ سگنلز', mood:'مارکیٹ کا ماحول', trend:'آج مارکیٹ کا رجحان', trendUp:'زیادہ تر اوپر', trendDn:'زیادہ تر نیچے', trendMix:'ملا جلا', sUp:'مضبوط اوپر سگنل', mUp:'ہلکا اوپر سگنل', unc:'غیر واضح', mDn:'ہلکا نیچے سگنل', sDn:'مضبوط نیچے سگنل', noSig:'کوئی سگنل نہیں', vH:'حجم زیادہ', vN:'حجم معمول', vL:'حجم کم', fgEF:'شدید خوف', fgF:'خوف', fgN:'درمیانہ', fgG:'لالچ', fgEG:'شدید لالچ', disc:'سگنلز مارکیٹ ڈیٹا (قیمت کی حرکت اور حجم) سے گنے جاتے ہیں۔ یہ صرف اشارے ہیں، مالی مشورہ نہیں، اور مستقبل کی پیش گوئی نہیں کر سکتے۔', seeMore:'مزید دیکھیں', seeLess:'کم دیکھیں', full:'مکمل خبر پڑھیں', src:'ذریعہ', updated:'آخری تازہ کاری', refresh:'تازہ کریں', loading:'تازہ ترین خبریں آ رہی ہیں…', cats:{world:'دنیا'} } },
   ar: { label:'العربية', dir:'rtl', cls:'rtl-text', feeds:{ world:[ {name:'BBC Arabic', url:'https://feeds.bbci.co.uk/arabic/rss.xml'}, {name:'BBC Arabic', url:'https://feeds.bbci.co.uk/arabic/middle_east/rss.xml'} ] },
-    ui:{ breaking:'خبر عاجل', latest:'آخر الأخبار', more:'المزيد من أخبار العالم — قصص رائجة', moreBtn:'تحميل المزيد من الأخبار', crypto:'أسعار العملات الرقمية مباشر', seeMore:'شاهد المزيد', seeLess:'شاهد أقل', full:'اقرأ الخبر كاملاً', src:'المصدر', updated:'آخر تحديث', refresh:'تحديث', loading:'جارٍ تحميل آخر الأخبار…', cats:{world:'العالم'} } },
+    ui:{ breaking:'خبر عاجل', latest:'آخر الأخبار', more:'المزيد من أخبار العالم — قصص رائجة', moreBtn:'تحميل المزيد من الأخبار', crypto:'أسعار العملات الرقمية مباشر', sig:'إشارات سوق الكريبتو', mood:'مزاج السوق', trend:'اتجاه السوق اليوم', trendUp:'صاعد في الغالب', trendDn:'هابط في الغالب', trendMix:'مختلط', sUp:'إشارة صعود قوية', mUp:'إشارة صعود خفيفة', unc:'غير واضح', mDn:'إشارة هبوط خفيفة', sDn:'إشارة هبوط قوية', noSig:'لا إشارة', vH:'حجم مرتفع', vN:'حجم عادي', vL:'حجم منخفض', fgEF:'خوف شديد', fgF:'خوف', fgN:'محايد', fgG:'طمع', fgEG:'طمع شديد', disc:'تُحسب الإشارات من بيانات السوق (حركة السعر والحجم). هي مؤشرات فقط وليست نصيحة مالية، ولا يمكنها التنبؤ بالمستقبل.', seeMore:'شاهد المزيد', seeLess:'شاهد أقل', full:'اقرأ الخبر كاملاً', src:'المصدر', updated:'آخر تحديث', refresh:'تحديث', loading:'جارٍ تحميل آخر الأخبار…', cats:{world:'العالم'} } },
   ja: { label:'日本語', dir:'ltr', cls:'ja-text', feeds:{ world:[ {name:'NHK News', url:'https://www.nhk.or.jp/rss/news/cat0.xml'}, {name:'NHK 国際', url:'https://www.nhk.or.jp/rss/news/cat6.xml'} ] },
-    ui:{ breaking:'速報', latest:'最新ニュース', more:'世界のニュースをもっと — 人気の記事', moreBtn:'もっと読み込む', crypto:'暗号資産のライブ価格', seeMore:'もっと見る', seeLess:'閉じる', full:'全文を読む', src:'出典', updated:'最終更新', refresh:'更新', loading:'最新ニュースを読み込み中…', cats:{world:'世界'} } },
+    ui:{ breaking:'速報', latest:'最新ニュース', more:'世界のニュースをもっと — 人気の記事', moreBtn:'もっと読み込む', crypto:'暗号資産のライブ価格', sig:'暗号資産マーケットシグナル', mood:'市場ムード', trend:'今日の市場トレンド', trendUp:'おおむね上昇', trendDn:'おおむね下落', trendMix:'まちまち', sUp:'強い上昇シグナル', mUp:'弱い上昇シグナル', unc:'不明確', mDn:'弱い下落シグナル', sDn:'強い下落シグナル', noSig:'シグナルなし', vH:'出来高が多い', vN:'出来高は普通', vL:'出来高が少ない', fgEF:'極度の恐怖', fgF:'恐怖', fgN:'中立', fgG:'強欲', fgEG:'極度の強欲', disc:'シグナルは市場データ（価格の動きと出来高）から計算されます。指標であり、投資アドバイスではなく、将来を予測できません。', seeMore:'もっと見る', seeLess:'閉じる', full:'全文を読む', src:'出典', updated:'最終更新', refresh:'更新', loading:'最新ニュースを読み込み中…', cats:{world:'世界'} } },
   zh: { label:'中文', dir:'ltr', cls:'zh-text', feeds:{ world:[ {name:'BBC 中文', url:'https://feeds.bbci.co.uk/zhongwen/simp/rss.xml'} ] },
-    ui:{ breaking:'突发新闻', latest:'最新消息', more:'更多世界新闻 — 热门报道', moreBtn:'加载更多新闻', crypto:'加密货币实时价格', seeMore:'查看更多', seeLess:'收起', full:'阅读全文', src:'来源', updated:'最后更新', refresh:'刷新', loading:'正在加载最新消息…', cats:{world:'世界'} } },
+    ui:{ breaking:'突发新闻', latest:'最新消息', more:'更多世界新闻 — 热门报道', moreBtn:'加载更多新闻', crypto:'加密货币实时价格', sig:'加密市场信号', mood:'市场情绪', trend:'今日市场趋势', trendUp:'多数上涨', trendDn:'多数下跌', trendMix:'涨跌互现', sUp:'强上涨信号', mUp:'弱上涨信号', unc:'不明确', mDn:'弱下跌信号', sDn:'强下跌信号', noSig:'无信号', vH:'交易量高', vN:'交易量正常', vL:'交易量低', fgEF:'极度恐惧', fgF:'恐惧', fgN:'中性', fgG:'贪婪', fgEG:'极度贪婪', disc:'信号根据市场数据（价格变动和交易量）计算。它们只是指标，不是投资建议，也无法预测未来。', seeMore:'查看更多', seeLess:'收起', full:'阅读全文', src:'来源', updated:'最后更新', refresh:'刷新', loading:'正在加载最新消息…', cats:{world:'世界'} } },
 };
 const startLang = new URLSearchParams(location.search).get('lang');
 let curLang = LANGS[startLang] ? startLang : 'en', curCat = 'world';
@@ -252,9 +283,10 @@ function readCache(){
 async function loadCoins(){
   const box = document.getElementById('coins');
   try{
-    const r = await fetchTimeout('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=15&page=1&price_change_percentage=24h', FETCH_TIMEOUT_MS);
+    const r = await fetchTimeout('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=15&page=1&price_change_percentage=1h,24h,7d', FETCH_TIMEOUT_MS);
     if(!r.ok) throw new Error('cg');
     const coins = await r.json();
+    marketsCache = coins; marketsAt = Date.now(); saveSigCache(); renderSignals(); renderMood();
     box.innerHTML = coins.map(c => {
       const ch = c.price_change_percentage_24h_in_currency || 0;
       const cls = ch >= 0 ? 'up' : 'down';
@@ -278,6 +310,139 @@ async function loadCoins(){
       if(out.length) box.innerHTML = out.map(c => '<div class="coin"><div class="nm">' + esc(c.name) + '</div><div class="pr">$' + c.price.toLocaleString('en-US', {maximumFractionDigits: 2}) + '</div><div class="ch ' + (c.ch >= 0 ? 'up' : 'down') + '">' + (c.ch >= 0 ? '▲' : '▼') + ' ' + Math.abs(c.ch).toFixed(2) + '% (24h)</div></div>').join('');
     }catch(e2){ /* keep placeholder */ }
   }
+}
+
+let marketsCache = null, marketsAt = 0, fngCache = null, sigFallback = null;
+function numOrNull(v){ const n = (v == null ? NaN : parseFloat(v)); return isNaN(n) ? null : n; }
+function fmtPrice(p){ if(p == null || isNaN(p)) return '—'; return p >= 1 ? '$' + p.toLocaleString('en-US', {maximumFractionDigits: 2}) : '$' + p; }
+function fmtPct(v){ if(v == null) return '—'; return (v >= 0 ? '+' : '') + v.toFixed(1) + '%'; }
+function scoreCoin(p1h, p24, p7d, volRatio){
+  let s = 0;
+  if(p1h != null){ if(p1h > 0.5) s += 1; else if(p1h < -0.5) s -= 1; }
+  if(p24 != null){ if(p24 > 1.5) s += 1; else if(p24 < -1.5) s -= 1; }
+  if(p7d != null){ if(p7d > 4) s += 2; else if(p7d < -4) s -= 2; else if(p7d > 1) s += 1; else if(p7d < -1) s -= 1; }
+  let vol = 'normal';
+  if(volRatio != null){
+    if(volRatio > 0.10){ vol = 'high'; if(p24 != null){ if(p24 > 0) s += 1; else if(p24 < 0) s -= 1; } }
+    else if(volRatio < 0.02) vol = 'low';
+  }
+  if(s > 5) s = 5; if(s < -5) s = -5;
+  return { score: s, vol: vol };
+}
+function badgeKey(score){ if(score >= 3) return 'su'; if(score >= 1) return 'mu'; if(score === 0) return 'un'; if(score >= -2) return 'md'; return 'sd'; }
+function normCoin(c){
+  return { name: c.name || '', symbol: (c.symbol || '').toUpperCase(), image: c.image || '', price: c.current_price,
+    p1h: numOrNull(c.price_change_percentage_1h_in_currency),
+    p24: numOrNull(c.price_change_percentage_24h_in_currency != null ? c.price_change_percentage_24h_in_currency : c.price_change_percentage_24h),
+    p7d: numOrNull(c.price_change_percentage_7d_in_currency),
+    volRatio: (c.total_volume != null && c.market_cap) ? c.total_volume / c.market_cap : null };
+}
+function sigList(){
+  if(marketsCache && marketsCache.length) return marketsCache.slice(0, 8).map(normCoin);
+  if(sigFallback && sigFallback.length) return sigFallback.slice(0, 8);
+  return [];
+}
+function trendKey(){
+  let arr = null;
+  if(marketsCache && marketsCache.length) arr = marketsCache.slice(0, 10).map(normCoin);
+  else if(sigFallback && sigFallback.length) arr = sigFallback.slice(0, 10);
+  if(!arr) return null;
+  const withPct = arr.filter(c => c.p7d != null);
+  if(!withPct.length) return null;
+  const share = withPct.filter(c => c.p7d > 0).length / withPct.length;
+  if(share >= 0.6) return 'trendUp';
+  if(share <= 0.4) return 'trendDn';
+  return 'trendMix';
+}
+function fngClass(v){ if(v <= 24) return 'fg-xf'; if(v <= 44) return 'fg-f'; if(v <= 55) return 'fg-n'; if(v <= 74) return 'fg-g'; return 'fg-xg'; }
+function renderMood(){
+  const ui = LANGS[curLang].ui;
+  const box = document.getElementById('sigMood');
+  if(!box) return;
+  let html = '';
+  if(fngCache){
+    const names = { 'Extreme Fear':'fgEF', 'Fear':'fgF', 'Neutral':'fgN', 'Greed':'fgG', 'Extreme Greed':'fgEG' };
+    const label = ui[names[fngCache.cls]] || fngCache.cls;
+    html += '<span class="moodchip ' + fngClass(fngCache.value) + '">🧭 ' + esc(ui.mood) + ': ' + esc(label) + ' (' + fngCache.value + '/100)</span>';
+  }
+  const tk = trendKey();
+  if(tk) html += '<span class="moodchip trend">📊 ' + esc(ui.trend) + ': ' + esc(ui[tk]) + '</span>';
+  box.innerHTML = html;
+}
+function renderSignals(){
+  const ui = LANGS[curLang].ui;
+  const grid = document.getElementById('sigGrid');
+  if(!grid) return;
+  const list = sigList();
+  if(!list.length) return;
+  const badges = { su: ['▲▲', ui.sUp], mu: ['▲', ui.mUp], un: ['●', ui.unc], md: ['▼', ui.mDn], sd: ['▼▼', ui.sDn] };
+  const volTxt = { high: ui.vH, normal: ui.vN, low: ui.vL };
+  grid.innerHTML = list.map(c => {
+    const has = (c.p1h != null || c.p24 != null || c.p7d != null);
+    const sc = scoreCoin(c.p1h, c.p24, c.p7d, c.volRatio);
+    let badge;
+    if(!has) badge = '<span class="sigbadge b-no">— ' + esc(ui.noSig) + '</span>';
+    else { const k = badgeKey(sc.score); badge = '<span class="sigbadge b-' + k + '">' + badges[k][0] + ' ' + esc(badges[k][1]) + '</span>'; }
+    const chg = v => v == null ? '<span style="color:#7d90ad">—</span>' : '<span class="' + (v >= 0 ? 'up' : 'down') + '">' + fmtPct(v) + '</span>';
+    const reason = has ? ('7d ' + fmtPct(c.p7d) + ' · 24h ' + fmtPct(c.p24) + ' · ' + esc(volTxt[sc.vol])) : '—';
+    return '<div class="sigcard"><div class="sigtop">'
+      + (c.image ? '<img src="' + esc(c.image) + '" alt="" loading="lazy" onerror="this.remove()">' : '')
+      + '<span class="signm">' + esc(c.name) + '</span><span class="sigsym">' + esc(c.symbol) + '</span>' + badge + '</div>'
+      + '<div class="sigrow"><span class="sigpr">' + fmtPrice(c.price) + '</span>'
+      + '<span class="sigch">24h ' + chg(c.p24) + ' · 7d ' + chg(c.p7d) + '</span></div>'
+      + '<div class="sigreason">' + reason + '</div></div>';
+  }).join('');
+}
+function saveSigCache(){
+  try {
+    const coins = (marketsCache && marketsCache.length) ? marketsCache.slice(0, 10).map(normCoin) : (sigFallback || []);
+    if(!coins.length && !fngCache) return;
+    localStorage.setItem('nova-signals-v1', JSON.stringify({ t: Date.now(), coins: coins, fng: fngCache }));
+  } catch(e){}
+}
+function bootSigCache(){
+  try {
+    const raw = localStorage.getItem('nova-signals-v1');
+    if(!raw) return;
+    const j = JSON.parse(raw);
+    if(j && Array.isArray(j.coins) && j.coins.length) sigFallback = j.coins;
+    if(j && j.fng) fngCache = j.fng;
+    renderSignals(); renderMood();
+  } catch(e){}
+}
+async function loadSignals(force){
+  if(!force && marketsCache && (Date.now() - marketsAt) < 5 * 60 * 1000){ renderSignals(); renderMood(); return; }
+  try {
+    const r = await fetchTimeout('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=15&page=1&price_change_percentage=1h,24h,7d', FETCH_TIMEOUT_MS);
+    if(!r.ok) throw new Error('cg');
+    marketsCache = await r.json(); marketsAt = Date.now();
+    saveSigCache(); renderSignals(); renderMood();
+  } catch(e){
+    if(sigList().length){ renderSignals(); renderMood(); return; }
+    try {
+      const defs = [ ['BTCUSDT','Bitcoin','BTC'], ['ETHUSDT','Ethereum','ETH'], ['BNBUSDT','BNB','BNB'], ['XRPUSDT','XRP','XRP'], ['SOLUSDT','Solana','SOL'], ['DOGEUSDT','Dogecoin','DOGE'], ['ADAUSDT','Cardano','ADA'], ['TRXUSDT','TRON','TRX'] ];
+      const rs = await Promise.all(defs.map(async d => {
+        try {
+          const rr = await fetchTimeout('https://api.binance.com/api/v3/ticker/price?symbol=' + d[0], 6000);
+          if(!rr.ok) return null;
+          const t = await rr.json();
+          return { name: d[1], symbol: d[2], image: '', price: parseFloat(t.price), p1h: null, p24: null, p7d: null, volRatio: null };
+        } catch(e){ return null; }
+      }));
+      const out = rs.filter(Boolean);
+      if(out.length){ sigFallback = out; saveSigCache(); renderSignals(); renderMood(); }
+    } catch(e2){}
+  }
+}
+async function loadFearGreed(){
+  try {
+    const r = await fetchTimeout('https://api.alternative.me/fng/?limit=1', FETCH_TIMEOUT_MS);
+    if(!r.ok) throw new Error('fng');
+    const j = await r.json();
+    const d = j && j.data && j.data[0];
+    const v = d ? parseInt(d.value, 10) : NaN;
+    if(d && !isNaN(v)){ fngCache = { value: v, cls: d.value_classification || '' }; saveSigCache(); renderMood(); }
+  } catch(e){}
 }
 function render(items){
   const ui = LANGS[curLang].ui;
@@ -380,7 +545,7 @@ function buildChrome(){
     const b = document.createElement('button');
     b.type = 'button'; b.textContent = LANGS[k].label;
     if(k === curLang) b.className = 'on';
-    b.onclick = () => { curLang = k; curCat = 'world'; try{ history.replaceState(null, '', '?lang=' + k); }catch(e){} buildChrome(); load(); loadCoins(); };
+    b.onclick = () => { curLang = k; curCat = 'world'; try{ history.replaceState(null, '', '?lang=' + k); }catch(e){} buildChrome(); load(); loadCoins(); renderSignals(); renderMood(); };
     wrap.appendChild(b);
   });
   const cats = document.getElementById('cats');
@@ -395,14 +560,19 @@ function buildChrome(){
   });
   document.getElementById('refreshBtn').textContent = '↻ ' + ui.refresh;
   document.getElementById('cryptoTitle').textContent = '💰 ' + ui.crypto;
+  document.getElementById('sigTitle').textContent = '📈 ' + ui.sig;
+  document.getElementById('sigDisc').textContent = ui.disc;
   document.getElementById('newsTitle').textContent = '📰 ' + ui.latest;
 }
-document.getElementById('refreshBtn').onclick = () => { load(); loadCoins(); };
+document.getElementById('refreshBtn').onclick = () => { load(); loadCoins(); loadSignals(true); loadFearGreed(); };
 buildChrome();
 load();
 loadCoins();
+bootSigCache(); setTimeout(function(){ loadSignals(); }, 1500); loadFearGreed();
 setInterval(load, 10 * 60 * 1000);
 setInterval(loadCoins, 60 * 1000);
+setInterval(loadSignals, 5 * 60 * 1000);
+setInterval(loadFearGreed, 30 * 60 * 1000);
 </script>
 <script data-goatcounter="https://yousuftools.goatcounter.com/count" data-goatcounter-settings='{"path": "/nova-news"}' async src="//gc.zgo.at/count.js"></script>
 <!-- visitor counter -->
