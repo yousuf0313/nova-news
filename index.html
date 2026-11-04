@@ -111,6 +111,16 @@
     background: linear-gradient(165deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
     border:1px solid rgba(255,255,255,.12); box-shadow:0 10px 24px rgba(0,0,0,.38); backdrop-filter: blur(6px); }
   .card img { width:100%; height:175px; object-fit:cover; display:block; }
+  .cardimg { position:relative; height:175px; flex:none; overflow:hidden;
+    background: linear-gradient(140deg,#173a63 0%, #0a1322 55%, #3d0f1e 130%); }
+  .cardimg .ph { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
+  .cardimg .ph .globe { font-size:44px; filter: drop-shadow(0 0 10px rgba(244,197,66,.55)); }
+  .cardimg .ph .phsrc { font-size:11px; letter-spacing:1.5px; font-weight:bold; color:#f4c542; text-transform:uppercase; }
+  .cardimg img { position:absolute; inset:0; width:100%; height:100%; }
+  .hero .imgwrap.noimg { height:230px; background: linear-gradient(140deg,#173a63 0%, #0a1322 55%, #3d0f1e 130%); }
+  .hero .imgwrap.noimg .ph { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:64px; filter: drop-shadow(0 0 14px rgba(244,197,66,.55)); }
+  .morewrap { text-align:center; margin:20px 0 6px; }
+  .morewrap .btn { padding:13px 30px; font-size:15px; border-radius:12px; }
   .card .body { padding:14px 15px 15px; display:flex; flex-direction:column; flex:1; }
   .card h3 { font-size:17.5px; line-height:1.42; margin:0 0 7px; color:#fff; }
   .card .sum { font-size:14px; }
@@ -157,20 +167,21 @@ const LOCALES = { en:'en-GB', ur:'ur-PK', ar:'ar-EG', ja:'ja-JP', zh:'zh-CN' };
 const LANGS = {
   en: { label:'English', dir:'ltr', cls:'', feeds:{ world:[
       {name:'BBC World', url:'https://feeds.bbci.co.uk/news/world/rss.xml'},
-      {name:'Al Jazeera', url:'https://www.aljazeera.com/xml/rss/all.xml'} ],
+      {name:'Al Jazeera', url:'https://www.aljazeera.com/xml/rss/all.xml'},
+      {name:'The Guardian', url:'https://www.theguardian.com/world/rss'} ],
     pakistan:[ {name:'Dawn', url:'https://www.dawn.com/feeds/home'} ],
     sports:[ {name:'BBC Sport', url:'https://feeds.bbci.co.uk/sport/rss.xml'} ],
     business:[ {name:'BBC Business', url:'https://feeds.bbci.co.uk/news/business/rss.xml'} ],
     technology:[ {name:'BBC Technology', url:'https://feeds.bbci.co.uk/news/technology/rss.xml'} ] },
-    ui:{ breaking:'BREAKING NEWS', latest:'Latest News', crypto:'Live Crypto Prices', seeMore:'See more', seeLess:'See less', full:'Read full story', src:'Source', updated:'Last updated', refresh:'Refresh', loading:'Loading the latest news…', cats:{world:'World', pakistan:'Pakistan', sports:'Sports', business:'Business', technology:'Technology'} } },
-  ur: { label:'اردو', dir:'rtl', cls:'rtl-text', feeds:{ world:[ {name:'BBC Urdu', url:'https://feeds.bbci.co.uk/urdu/rss.xml'} ] },
-    ui:{ breaking:'بریکنگ نیوز', latest:'تازہ ترین خبریں', crypto:'کرپٹو کی لائیو قیمتیں', seeMore:'مزید دیکھیں', seeLess:'کم دیکھیں', full:'مکمل خبر پڑھیں', src:'ذریعہ', updated:'آخری تازہ کاری', refresh:'تازہ کریں', loading:'تازہ ترین خبریں آ رہی ہیں…', cats:{world:'دنیا'} } },
-  ar: { label:'العربية', dir:'rtl', cls:'rtl-text', feeds:{ world:[ {name:'BBC Arabic', url:'https://feeds.bbci.co.uk/arabic/rss.xml'} ] },
-    ui:{ breaking:'خبر عاجل', latest:'آخر الأخبار', crypto:'أسعار العملات الرقمية مباشر', seeMore:'شاهد المزيد', seeLess:'شاهد أقل', full:'اقرأ الخبر كاملاً', src:'المصدر', updated:'آخر تحديث', refresh:'تحديث', loading:'جارٍ تحميل آخر الأخبار…', cats:{world:'العالم'} } },
-  ja: { label:'日本語', dir:'ltr', cls:'ja-text', feeds:{ world:[ {name:'NHK News', url:'https://www.nhk.or.jp/rss/news/cat0.xml'} ] },
-    ui:{ breaking:'速報', latest:'最新ニュース', crypto:'暗号資産のライブ価格', seeMore:'もっと見る', seeLess:'閉じる', full:'全文を読む', src:'出典', updated:'最終更新', refresh:'更新', loading:'最新ニュースを読み込み中…', cats:{world:'世界'} } },
-  zh: { label:'中文', dir:'ltr', cls:'zh-text', feeds:{ world:[ {name:'BBC 中文', url:'https://feeds.bbci.co.uk/zhongwen/rss.xml'} ] },
-    ui:{ breaking:'突发新闻', latest:'最新消息', crypto:'加密货币实时价格', seeMore:'查看更多', seeLess:'收起', full:'阅读全文', src:'来源', updated:'最后更新', refresh:'刷新', loading:'正在加载最新消息…', cats:{world:'世界'} } },
+    ui:{ breaking:'BREAKING NEWS', latest:'Latest News', more:'More World News — Popular Stories', moreBtn:'Load more news', crypto:'Live Crypto Prices', seeMore:'See more', seeLess:'See less', full:'Read full story', src:'Source', updated:'Last updated', refresh:'Refresh', loading:'Loading the latest news…', cats:{world:'World', pakistan:'Pakistan', sports:'Sports', business:'Business', technology:'Technology'} } },
+  ur: { label:'اردو', dir:'rtl', cls:'rtl-text', feeds:{ world:[ {name:'BBC Urdu', url:'https://feeds.bbci.co.uk/urdu/rss.xml'}, {name:'BBC Urdu', url:'https://feeds.bbci.co.uk/urdu/pakistan/rss.xml'} ] },
+    ui:{ breaking:'بریکنگ نیوز', latest:'تازہ ترین خبریں', more:'مزید عالمی خبریں — مقبول کہانیاں', moreBtn:'مزید خبریں لوڈ کریں', crypto:'کرپٹو کی لائیو قیمتیں', seeMore:'مزید دیکھیں', seeLess:'کم دیکھیں', full:'مکمل خبر پڑھیں', src:'ذریعہ', updated:'آخری تازہ کاری', refresh:'تازہ کریں', loading:'تازہ ترین خبریں آ رہی ہیں…', cats:{world:'دنیا'} } },
+  ar: { label:'العربية', dir:'rtl', cls:'rtl-text', feeds:{ world:[ {name:'BBC Arabic', url:'https://feeds.bbci.co.uk/arabic/rss.xml'}, {name:'BBC Arabic', url:'https://feeds.bbci.co.uk/arabic/middle_east/rss.xml'} ] },
+    ui:{ breaking:'خبر عاجل', latest:'آخر الأخبار', more:'المزيد من أخبار العالم — قصص رائجة', moreBtn:'تحميل المزيد من الأخبار', crypto:'أسعار العملات الرقمية مباشر', seeMore:'شاهد المزيد', seeLess:'شاهد أقل', full:'اقرأ الخبر كاملاً', src:'المصدر', updated:'آخر تحديث', refresh:'تحديث', loading:'جارٍ تحميل آخر الأخبار…', cats:{world:'العالم'} } },
+  ja: { label:'日本語', dir:'ltr', cls:'ja-text', feeds:{ world:[ {name:'NHK News', url:'https://www.nhk.or.jp/rss/news/cat0.xml'}, {name:'NHK 国際', url:'https://www.nhk.or.jp/rss/news/cat6.xml'} ] },
+    ui:{ breaking:'速報', latest:'最新ニュース', more:'世界のニュースをもっと — 人気の記事', moreBtn:'もっと読み込む', crypto:'暗号資産のライブ価格', seeMore:'もっと見る', seeLess:'閉じる', full:'全文を読む', src:'出典', updated:'最終更新', refresh:'更新', loading:'最新ニュースを読み込み中…', cats:{world:'世界'} } },
+  zh: { label:'中文', dir:'ltr', cls:'zh-text', feeds:{ world:[ {name:'BBC 中文', url:'https://feeds.bbci.co.uk/zhongwen/simp/rss.xml'} ] },
+    ui:{ breaking:'突发新闻', latest:'最新消息', more:'更多世界新闻 — 热门报道', moreBtn:'加载更多新闻', crypto:'加密货币实时价格', seeMore:'查看更多', seeLess:'收起', full:'阅读全文', src:'来源', updated:'最后更新', refresh:'刷新', loading:'正在加载最新消息…', cats:{world:'世界'} } },
 };
 const startLang = new URLSearchParams(location.search).get('lang');
 let curLang = LANGS[startLang] ? startLang : 'en', curCat = 'world';
@@ -273,7 +284,8 @@ function render(items){
   const content = document.getElementById('content');
   document.getElementById('ticker').innerHTML = items.slice(0,10).map(i => ' 🔴 ' + esc(i.title)).join(' &nbsp;•&nbsp; ') + ' &nbsp;•&nbsp; ';
   if(!items.length){ content.innerHTML = '<div class="err">' + esc(ui.loading) + '</div>'; return; }
-  const hero = items[0], rest = items.slice(1, 25);
+  lastItems = items;
+  const hero = items[0], rest = items.slice(1, 13), moreItems = items.slice(13, displayLimit);
   const sumHtml = (it, long) => {
     const d = it.desc || '';
     const words = d.split(' ');
@@ -284,17 +296,26 @@ function render(items){
   const actions = it => '<div class="actions">'
     + '<button class="btn btn-line" type="button" onclick="toggleSum(this)">' + esc(ui.seeMore) + '</button>'
     + '<a class="btn btn-red" href="' + esc(it.link) + '" target="_blank" rel="noopener">' + esc(ui.full) + ' →</a></div>';
+  const cardHtml = it => '<article class="card">'
+    + '<div class="cardimg"><div class="ph"><span class="globe">🌍</span><span class="phsrc">' + esc(it.source) + '</span></div>'
+    + (it.img ? '<img src="' + esc(it.img) + '" alt="" loading="lazy" onerror="this.remove()">' : '') + '</div>'
+    + '<div class="body"><h3>' + esc(it.title) + '</h3>'
+    + '<div class="meta">' + esc(ui.src) + ': ' + esc(it.source) + ' · ' + esc(ago(it.date, curLang)) + '</div>'
+    + '<p class="sum">' + sumHtml(it, false) + '</p>' + actions(it) + '</div></article>';
   let html = '<article class="hero">'
-    + (hero.img ? '<div class="imgwrap"><img src="' + esc(hero.img) + '" alt="" loading="lazy"><div class="onimg"><span class="badge">' + esc(ui.breaking) + '</span><h2>' + esc(hero.title) + '</h2></div></div>'
-                : '<div class="body"><span class="badge">' + esc(ui.breaking) + '</span><h2>' + esc(hero.title) + '</h2></div>')
+    + (hero.img ? '<div class="imgwrap"><img src="' + esc(hero.img) + '" alt="" loading="lazy" onerror="this.closest(\'.imgwrap\').classList.add(\'noimg\'); this.remove()"><div class="onimg"><span class="badge">' + esc(ui.breaking) + '</span><h2>' + esc(hero.title) + '</h2></div></div>'
+                : '<div class="imgwrap noimg"><div class="ph">🌍</div><div class="onimg"><span class="badge">' + esc(ui.breaking) + '</span><h2>' + esc(hero.title) + '</h2></div></div>')
     + '<div class="body">'
     + '<div class="meta">' + esc(ui.src) + ': ' + esc(hero.source) + ' · ' + esc(ago(hero.date, curLang)) + '</div>'
     + '<p class="sum">' + sumHtml(hero, true) + '</p>' + actions(hero) + '</div></article>';
-  html += '<div class="grid">' + rest.map(it => '<article class="card">'
-    + (it.img ? '<img src="' + esc(it.img) + '" alt="" loading="lazy">' : '')
-    + '<div class="body"><h3>' + esc(it.title) + '</h3>'
-    + '<div class="meta">' + esc(ui.src) + ': ' + esc(it.source) + ' · ' + esc(ago(it.date, curLang)) + '</div>'
-    + '<p class="sum">' + sumHtml(it, false) + '</p>' + actions(it) + '</div></article>').join('') + '</div>';
+  html += '<div class="grid">' + rest.map(cardHtml).join('') + '</div>';
+  if(moreItems.length){
+    html += '<div class="sec-title">' + esc(ui.more || 'More World News') + '</div>'
+      + '<div class="grid">' + moreItems.map(cardHtml).join('') + '</div>';
+  }
+  if(items.length > displayLimit){
+    html += '<div class="morewrap"><button class="btn btn-red" type="button" onclick="loadMore()">' + esc(ui.moreBtn || 'Load more') + ' (' + (items.length - displayLimit) + ')</button></div>';
+  }
   content.innerHTML = html;
 }
 function toggleSum(btn){
@@ -305,6 +326,9 @@ function toggleSum(btn){
   if(open) btn.closest('article').scrollIntoView({ behavior:'smooth', block:'start' });
 }
 let loadSeq = 0;
+const PAGE_FIRST = 31, PAGE_NEXT = 24;
+let displayLimit = PAGE_FIRST, lastItems = [];
+function loadMore(){ displayLimit += PAGE_NEXT; if(lastItems.length) render(lastItems); }
 function paintDate(){
   const now = new Date();
   const greg = now.toLocaleDateString(LOCALES[curLang], { weekday:'long', year:'numeric', month:'long', day:'numeric' });
@@ -324,6 +348,7 @@ function paintUpdated(ts){
 async function load(){
   const L = LANGS[curLang], ui = L.ui;
   const mySeq = ++loadSeq, myLang = curLang, myCat = curCat;
+  displayLimit = PAGE_FIRST;
   document.documentElement.lang = curLang;
   document.body.dir = L.dir;
   document.getElementById('content').className = L.cls;
@@ -382,10 +407,10 @@ setInterval(loadCoins, 60 * 1000);
 <script data-goatcounter="https://yousuftools.goatcounter.com/count" data-goatcounter-settings='{"path": "/nova-news"}' async src="//gc.zgo.at/count.js"></script>
 <!-- visitor counter -->
 <script>
- (function(){try{
-  var doc="projects/rabta-24267/databases/(default)/documents/siteStats/nova-news";
-  fetch("https://firestore.googleapis.com/v1/projects/rabta-24267/databases/(default)/documents:commit?key=AIzaSyBYLf2pXzjyefhk2mC-Q71G6SFgheC6d2E",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({writes:[{update:{name:doc,fields:{}},updateMask:{fieldPaths:[]},updateTransforms:[{fieldPath:"views",increment:{integerValue:"1"}}]}]})}).catch(function(){});
- }catch(e){}})();
+(function(){try{
+var doc="projects/rabta-24267/databases/(default)/documents/siteStats/nova-news";
+fetch("https://firestore.googleapis.com/v1/projects/rabta-24267/databases/(default)/documents:commit?key=AIzaSyBYLf2pXzjyefhk2mC-Q71G6SFgheC6d2E",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({writes:[{update:{name:doc,fields:{}},updateMask:{fieldPaths:[]},updateTransforms:[{fieldPath:"views",increment:{integerValue:"1"}}]}]})}).catch(function(){});
+}catch(e){}})();
 </script>
 </body>
 </html>
