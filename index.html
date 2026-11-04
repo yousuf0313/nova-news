@@ -380,5 +380,12 @@ setInterval(load, 10 * 60 * 1000);
 setInterval(loadCoins, 60 * 1000);
 </script>
 <script data-goatcounter="https://yousuftools.goatcounter.com/count" data-goatcounter-settings='{"path": "/nova-news"}' async src="//gc.zgo.at/count.js"></script>
+<!-- visitor counter -->
+<script>
+ (function(){try{
+  var doc="projects/rabta-24267/databases/(default)/documents/siteStats/nova-news";
+  fetch("https://firestore.googleapis.com/v1/projects/rabta-24267/databases/(default)/documents:commit?key=AIzaSyBYLf2pXzjyefhk2mC-Q71G6SFgheC6d2E",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({writes:[{update:{name:doc,fields:{}},updateMask:{fieldPaths:[]},updateTransforms:[{fieldPath:"views",increment:{integerValue:"1"}}]}]})}).catch(function(){});
+ }catch(e){}})();
+</script>
 </body>
 </html>
