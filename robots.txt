@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://yousuf0313.github.io/nova-news/sitemap.xml
