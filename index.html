@@ -192,6 +192,7 @@ const PROXIES = [
   u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
   u => 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(u),
   u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u),
+  u => 'https://api.cors.lol/?url=' + encodeURIComponent(u),
 ];
 const FETCH_TIMEOUT_MS = 8000;
 const LOCALES = { en:'en-GB', ur:'ur-PK', ar:'ar-EG', ja:'ja-JP', zh:'zh-CN' };
@@ -209,7 +210,7 @@ const LANGS = {
     ui:{ breaking:'بریکنگ نیوز', latest:'تازہ ترین خبریں', more:'مزید عالمی خبریں — مقبول کہانیاں', moreBtn:'مزید خبریں لوڈ کریں', crypto:'کرپٹو کی لائیو قیمتیں', sig:'کرپٹو مارکیٹ سگنلز', mood:'مارکیٹ کا ماحول', trend:'آج مارکیٹ کا رجحان', trendUp:'زیادہ تر اوپر', trendDn:'زیادہ تر نیچے', trendMix:'ملا جلا', sUp:'مضبوط اوپر سگنل', mUp:'ہلکا اوپر سگنل', unc:'غیر واضح', mDn:'ہلکا نیچے سگنل', sDn:'مضبوط نیچے سگنل', noSig:'کوئی سگنل نہیں', vH:'حجم زیادہ', vN:'حجم معمول', vL:'حجم کم', fgEF:'شدید خوف', fgF:'خوف', fgN:'درمیانہ', fgG:'لالچ', fgEG:'شدید لالچ', disc:'سگنلز مارکیٹ ڈیٹا (قیمت کی حرکت اور حجم) سے گنے جاتے ہیں۔ یہ صرف اشارے ہیں، مالی مشورہ نہیں، اور مستقبل کی پیش گوئی نہیں کر سکتے۔', seeMore:'مزید دیکھیں', seeLess:'کم دیکھیں', full:'مکمل خبر پڑھیں', src:'ذریعہ', updated:'آخری تازہ کاری', refresh:'تازہ کریں', loading:'تازہ ترین خبریں آ رہی ہیں…', cats:{world:'دنیا'} } },
   ar: { label:'العربية', dir:'rtl', cls:'rtl-text', feeds:{ world:[ {name:'BBC Arabic', url:'https://feeds.bbci.co.uk/arabic/rss.xml'}, {name:'BBC Arabic', url:'https://feeds.bbci.co.uk/arabic/middle_east/rss.xml'} ] },
     ui:{ breaking:'خبر عاجل', latest:'آخر الأخبار', more:'المزيد من أخبار العالم — قصص رائجة', moreBtn:'تحميل المزيد من الأخبار', crypto:'أسعار العملات الرقمية مباشر', sig:'إشارات سوق الكريبتو', mood:'مزاج السوق', trend:'اتجاه السوق اليوم', trendUp:'صاعد في الغالب', trendDn:'هابط في الغالب', trendMix:'مختلط', sUp:'إشارة صعود قوية', mUp:'إشارة صعود خفيفة', unc:'غير واضح', mDn:'إشارة هبوط خفيفة', sDn:'إشارة هبوط قوية', noSig:'لا إشارة', vH:'حجم مرتفع', vN:'حجم عادي', vL:'حجم منخفض', fgEF:'خوف شديد', fgF:'خوف', fgN:'محايد', fgG:'طمع', fgEG:'طمع شديد', disc:'تُحسب الإشارات من بيانات السوق (حركة السعر والحجم). هي مؤشرات فقط وليست نصيحة مالية، ولا يمكنها التنبؤ بالمستقبل.', seeMore:'شاهد المزيد', seeLess:'شاهد أقل', full:'اقرأ الخبر كاملاً', src:'المصدر', updated:'آخر تحديث', refresh:'تحديث', loading:'جارٍ تحميل آخر الأخبار…', cats:{world:'العالم'} } },
-  ja: { label:'日本語', dir:'ltr', cls:'ja-text', feeds:{ world:[ {name:'NHK News', url:'https://www.nhk.or.jp/rss/news/cat0.xml'}, {name:'NHK 国際', url:'https://www.nhk.or.jp/rss/news/cat6.xml'} ] },
+  ja: { label:'日本語', dir:'ltr', cls:'ja-text', feeds:{ world:[ {name:'NHK News', url:'https://news.web.nhk/n-data/conf/na/rss/cat0.xml'}, {name:'NHK 国際', url:'https://news.web.nhk/n-data/conf/na/rss/cat6.xml'} ] },
     ui:{ breaking:'速報', latest:'最新ニュース', more:'世界のニュースをもっと — 人気の記事', moreBtn:'もっと読み込む', crypto:'暗号資産のライブ価格', sig:'暗号資産マーケットシグナル', mood:'市場ムード', trend:'今日の市場トレンド', trendUp:'おおむね上昇', trendDn:'おおむね下落', trendMix:'まちまち', sUp:'強い上昇シグナル', mUp:'弱い上昇シグナル', unc:'不明確', mDn:'弱い下落シグナル', sDn:'強い下落シグナル', noSig:'シグナルなし', vH:'出来高が多い', vN:'出来高は普通', vL:'出来高が少ない', fgEF:'極度の恐怖', fgF:'恐怖', fgN:'中立', fgG:'強欲', fgEG:'極度の強欲', disc:'シグナルは市場データ（価格の動きと出来高）から計算されます。指標であり、投資アドバイスではなく、将来を予測できません。', seeMore:'もっと見る', seeLess:'閉じる', full:'全文を読む', src:'出典', updated:'最終更新', refresh:'更新', loading:'最新ニュースを読み込み中…', cats:{world:'世界'} } },
   zh: { label:'中文', dir:'ltr', cls:'zh-text', feeds:{ world:[ {name:'BBC 中文', url:'https://feeds.bbci.co.uk/zhongwen/simp/rss.xml'} ] },
     ui:{ breaking:'突发新闻', latest:'最新消息', more:'更多世界新闻 — 热门报道', moreBtn:'加载更多新闻', crypto:'加密货币实时价格', sig:'加密市场信号', mood:'市场情绪', trend:'今日市场趋势', trendUp:'多数上涨', trendDn:'多数下跌', trendMix:'涨跌互现', sUp:'强上涨信号', mUp:'弱上涨信号', unc:'不明确', mDn:'弱下跌信号', sDn:'强下跌信号', noSig:'无信号', vH:'交易量高', vN:'交易量正常', vL:'交易量低', fgEF:'极度恐惧', fgF:'恐惧', fgN:'中性', fgG:'贪婪', fgEG:'极度贪婪', disc:'信号根据市场数据（价格变动和交易量）计算。它们只是指标，不是投资建议，也无法预测未来。', seeMore:'查看更多', seeLess:'收起', full:'阅读全文', src:'来源', updated:'最后更新', refresh:'刷新', loading:'正在加载最新消息…', cats:{world:'世界'} } },
@@ -256,7 +257,27 @@ function firstSuccess(promises){
       () => { if(--left === 0 && !settled) reject(new Error('all failed')); }));
   });
 }
+let _selfFeeds = null, _selfFeedsAt = 0;
+async function selfHostedItems(feed){
+  try{
+    if(!_selfFeeds || Date.now() - _selfFeedsAt > 60000){
+      let data = null;
+      for(const url of ['data/feeds.json', 'https://yousuf0313.github.io/nova-news/data/feeds.json']){
+        try{ const r = await fetchTimeout(url, FETCH_TIMEOUT_MS); if(r.ok){ data = await r.json(); break; } }catch(e){}
+      }
+      if(!data) return null;
+      _selfFeeds = data; _selfFeedsAt = Date.now();
+    }
+    const gen = new Date(_selfFeeds.generated_at || 0).getTime();
+    if(!gen || Date.now() - gen > 30*60*1000) return null;
+    const raw = _selfFeeds.feeds && _selfFeeds.feeds[feed.url];
+    if(!raw || !raw.length) return null;
+    return raw.map(i => ({ title: i.title || '', link: i.link || '', desc: i.desc || '', date: new Date(i.date || ''), img: i.img || '', source: i.source || feed.name }));
+  }catch(e){ return null; }
+}
 async function fetchFeed(feed){
+  const own = await selfHostedItems(feed);
+  if(own && own.length) return own;
   const attempts = PROXIES.map(make => (async () => {
     const r = await fetchTimeout(make(feed.url), FETCH_TIMEOUT_MS);
     if(!r.ok) throw new Error('http ' + r.status);
